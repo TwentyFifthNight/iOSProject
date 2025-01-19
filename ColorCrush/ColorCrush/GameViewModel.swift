@@ -26,7 +26,7 @@ class GameViewModel: ObservableObject {
     }
 
     func dragAction(_ translation: CGSize, _ index: Int){
-        if startDetectDrag && !model.isProcessing && model.isPlaying && !model.isPaused && !model.blockMove {
+        if startDetectDrag && !model.isProcessing && model.isPlaying && !model.isPaused {
             var to: Int = -1
             if translation.width > 5 { // swipe right
                 if !stride(from: model.columnCount - 1, through: model.grid.count - 1, by: model.columnCount).contains(index) {
@@ -48,26 +48,37 @@ class GameViewModel: ObservableObject {
 
             if to > -1{
                 startDetectDrag = false
-                withAnimation(.easeInOut(duration: 0.4)) {
-                    model.swap(index, to)
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    model.move(index, to)
                 }
-            
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [self] in
-                    withAnimation(.linear(duration: 1)) {
-                        model.move(index, to)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
+                    model.process()
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [self] in
+                    withAnimation(.easeInOut(duration: 0.5)){
+                        model.finishMove(index, to)
                     }
                 }
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [self] in
-                    while model.isProcessing{
-                        
-                    }
-                    if !model.wasMatch && model.isPlaying{
-                        withAnimation(.linear(duration: 0.4)) {
-                            model.swap(index, to)
-                        }
-                    }
-                }
+//                withAnimation(.easeInOut(duration: 0.4)) {
+//                    model.swap(index, to)
+//                }
+//            
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [self] in
+//                    withAnimation(.linear(duration: 1)) {
+//                        model.move(index, to)
+//                    }
+//                }
+//                
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [self] in
+//                    while model.isProcessing{
+//                        
+//                    }
+//                    if !model.wasMatch && model.isPlaying{
+//                        withAnimation(.linear(duration: 0.4)) {
+//                            model.swap(index, to)
+//                        }
+//                    }
+//                }
             }
       } else {
           if translation == .zero {

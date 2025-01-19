@@ -5,7 +5,7 @@ struct ContentView: View {
     
     var body: some View {
         VStack(spacing: 16){
-            TitleView(title: "Color Crash", pauseFunction: viewModel.resumeGame)
+            TitleView(title: "Color Crash", pauseFunction: viewModel.pauseGame)
             MoveCountView(availableMoves: viewModel.availableMoves)
             DashBoardView(score: viewModel.score, bestScore: viewModel.bestScore)
             

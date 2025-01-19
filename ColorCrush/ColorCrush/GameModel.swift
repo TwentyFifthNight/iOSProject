@@ -14,7 +14,6 @@ struct GameModel {
     private(set) var isProcessing = false
     private(set) var isPlaying = false
     private(set) var isPaused = false
-    private(set) var blockMove = false;
     private(set) var columnCount = 7
     private(set) var rowCount = 9
     private var contentFactory: () -> ContentType
@@ -36,7 +35,6 @@ struct GameModel {
         generateGrid()
         isPlaying = true
         isPaused = false
-        blockMove = false
     }
 
     mutating func pauseGame() {
@@ -71,24 +69,29 @@ struct GameModel {
             }
         }
     }
-
-    mutating func swap(_ from: Int, _ to: Int){
-        grid.swapAt(from, to)
-        blockMove = false
-    }
     
     mutating func move(_ from: Int, _ to: Int){
         wasMatch = false
         isProcessing = true
-        
         availableMoves -= 1
-
-        checkMatch()
         
-        checkGameOver()
+        grid.swapAt(from, to)
+    }
+    
+    mutating func process(){
+        checkMatch()
+    }
+    
+    mutating func finishMove(_ from: Int, _ to: Int){
+        while(isProcessing){
+            
+        }
+        if !wasMatch{
+            grid.swapAt(from, to)
+        }
     }
 
-    mutating func checkGameOver(){
+    private mutating func checkGameOver(){
         if(availableMoves < 1){
             if self.score > self.bestScore {
                 self.bestScore = self.score
@@ -98,15 +101,18 @@ struct GameModel {
                 grid[index].contentType = .blank
             }
         }
+//        if !wasMatch{
+//
+//        }
         
-        if !wasMatch{
-            blockMove = true
-        }
+//        if !wasMatch{
+//            blockMove = true
+//        }
         
         isProcessing = false
     }
     
-    mutating func checkMatch() {
+    private mutating func checkMatch() {
         var checkList = Array(repeating: false, count: grid.count)
         var points = 0
         var combos = 0
@@ -161,11 +167,10 @@ struct GameModel {
             }
         }
         
+        
         for index in 0..<grid.count{
             if checkList[index] == true {
-                withAnimation(.linear(duration: 0.4)) {
-                    grid[index].contentType = .blank
-                }
+                grid[index].contentType = .blank
             }
         }
         score += points
@@ -173,21 +178,21 @@ struct GameModel {
         
         if isMatch {
             wasMatch = true
-            self.fallDown()
+            fallDown()
             
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-//                fallDown()
-//            }
+            
         } else {
             combo = 0
             if self.checkDead() {
                 grid.shuffle()
-                self.fallDown()
+                fallDown()
+            } else{
+                checkGameOver()
             }
         }
     }
 
-    mutating func fallDown() {
+    private mutating func fallDown() {
         var keepChecking = true
         while keepChecking {
             keepChecking = false
@@ -197,21 +202,16 @@ struct GameModel {
                     if (0..<columnCount).contains(index) {
                         grid[index].contentType = contentFactory()
                     } else {
-                        withAnimation(.easeInOut(duration: 0.4)) {
-                            grid.swapAt(index, index-columnCount)
-                        }
+                        grid.swapAt(index, index-columnCount)
                     }
                 }
             }
         }
         
         self.checkMatch()
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-//            self.checkMatch()
-//        }
     }
 
-    func checkDead() -> Bool {
+    private func checkDead() -> Bool {
         var gridCopy = grid
         //test for row move
         for index in 0..<grid.count {
