@@ -15,12 +15,20 @@ struct ContentView: View {
                 .cornerRadius(5)
                 .overlay {
                     if !viewModel.isPlaying {
-                        ButtonView(title: "Start", action: viewModel.startGame)
+                        ButtonView(title: "Start", action: {
+                            withAnimation(.linear(duration: 0.4)){
+                                viewModel.startGame()
+                            }
+                        })
                     }
                     else if viewModel.isPaused {
                         VStack(spacing: 15) {
                             ButtonView(title: "Continue", action: viewModel.resumeGame)
-                            ButtonView(title: "Restart", action: viewModel.startGame)
+                            ButtonView(title: "Restart", action: {
+                                withAnimation(.linear(duration: 0.4)){
+                                    viewModel.startGame()
+                                }
+                            })
                         }
                     }
                 }
@@ -67,9 +75,9 @@ struct ContentView: View {
     }
 
     func dragGesture(index: Int) -> some Gesture {
-        DragGesture(minimumDistance: 0)
+		DragGesture(minimumDistance: 0)
             .onChanged { value in
-                viewModel.dragAction(value.translation, index)
+				viewModel.dragAction(value.translation, index)
             }
     }
 }
@@ -78,7 +86,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        let model = GameViewModel(6, 6, 5){
+        let model = GameViewModel(6, 6, 20){
             [.oval, .drop, .app, .circle, .star, .heart, .snow].randomElement()!
         }
         ContentView(viewModel: model)

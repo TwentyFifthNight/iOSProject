@@ -8,21 +8,26 @@
 import SwiftUI
 
 struct ButtonView: View {
+    let title: String
+    let action: () -> Void
     
-  let title: String
-  let action: () -> Void
     
-  var body: some View {
-      Button {
-        action()
-      } label: {
-        Text(title)
-          .bold()
-          .font(.title)
-          .padding()
-          .foregroundColor(.white)
-          .background(.orange)
-          .cornerRadius(5)
+//    init(title: String, _ action: @escaping () -> Void){
+//        self.title = title
+//        self.action = action
+//    }
+    
+    var body: some View {
+        Button {
+            action()
+        } label: {
+            Text(title)
+                .bold()
+                .font(.title)
+                .padding()
+                .foregroundColor(.white)
+                .background(.orange)
+                .cornerRadius(5)
       }
   }
 }
